@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hritik Kushwaha - Interactive Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: #00ff88;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        /* Header Section */
+        
+        .header-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+        }
+        
+        .typing {
+            font-size: clamp(20px, 4vw, 48px);
+            border-right: 3px solid #00ff88;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation: typing 4s steps(45, end) forwards, blink 0.75s step-end infinite;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+        
+        @keyframes typing {
+            from {
+                width: 0
+            }
+            to {
+                width: 45ch
+            }
+        }
+        
+        @keyframes blink {
+            from,
+            to {
+                border-color: transparent
+            }
+            50% {
+                border-color: #00ff88
+            }
+        }
+        
+        .subtitle {
+            font-size: clamp(14px, 2vw, 20px);
+            color: #00ccaa;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 2s ease 2s forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ff88;
+            font-size: 18px;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+        
+        @keyframes bounce {
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+        /* Weather Simulation Section */
+        
+        .weather-section {
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(26, 26, 26, 0.9) 100%);
+        }
+        
+        .section-title {
+            font-size: clamp(24px, 5vw, 42px);
+            color: #00ff88;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+        
+        .section-subtitle {
+            font-size: clamp(14px, 2vw, 18px);
+            color: #00ccaa;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        canvas {
+            border: 3px solid #00ff88;
+            background: #87CEEB;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .controls {
+            margin: 30px 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-family: 'Courier New', Courier, monospace;
+            border: 2px solid #00ff88;
+            border-radius: 25px;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(26, 26, 26, 0.8));
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            background: linear-gradient(145deg, rgba(0, 255, 136, 0.1), rgba(0, 204, 170, 0.1));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+        }
+        
+        button.active {
+            background: linear-gradient(145deg, rgba(0, 255, 136, 0.3), rgba(0, 204, 170, 0.3));
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+            transform: scale(1.05);
+        }
+        
+        input[type="range"] {
+            margin-left: 15px;
+            width: 120px;
+            height: 6px;
+            background: linear-gradient(to right, #333, #00ff88);
+            outline: none;
+            border-radius: 3px;
+            appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #00ff88, #00ccaa);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #00ff88, #00ccaa);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        .audio-info,
+        .loading-status {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #00ccaa;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .loading-status {
+            font-size: 12px;
+            color: #888;
+        }
+        /* Contact Form Section */
+        
+        .contact-section {
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(26, 26, 26, 0.9) 0%, rgba(0, 0, 0, 0.9) 100%);
+        }
+        
+        .form-container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-container iframe {
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+        /* Footer */
+        
+        .footer {
+            padding: 30px 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 2px solid #00ff88;
+        }
+        
+        .creator-info {
+            font-size: 18px;
+            color: #00ff88;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .credits {
+            font-size: 14px;
+            color: #00ccaa;
+            margin-top: 15px;
+        }
+        /* Responsive Design */
+        
+        @media (max-width: 768px) {
+            .controls {
+                gap: 10px;
+            }
+            button {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+            .form-container {
+                padding: 20px;
+                margin: 0 10px;
+            }
+            .typing {
+                font-size: 18px;
+                width: auto;
+                max-width: 90vw;
+            }
+            @keyframes typing {
+                from {
+                    width: 0
+                }
+                to {
+                    width: 100%
+                }
+            }
+        }
+        /* Scrollbar Styling */
+        
+         ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+         ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+         ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #00ff88, #00ccaa);
+            border-radius: 6px;
+        }
+        
+         ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #00ccaa, #00ff88);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <section class="header-section" id="home">
+        <div class="typing">Hello I am Hritik Kushwaha Typing alphabet...</div>
+
+        <div class="scroll-indicator" onclick="document.getElementById('weather').scrollIntoView()">
+            ↓ Explore My Projects ↓
+        </div>
+    </section>
+
+    <!-- Weather Simulation Section -->
+    <section class="weather-section" id="weather">
+        <div class="section-title">🌤️ Interactive Weather Simulation 🌤️</div>
+        <div class="section-subtitle">Click the buttons below to change the weather!</div>
+
+        <div class="controls">
+            <button onclick="changeWeather('h')" id="sunny-btn" class="active">☀️ Sunny</button>
+            <button onclick="changeWeather('r')" id="rain-btn">🌧️ Rain</button>
+            <button onclick="changeWeather('s')" id="snow-btn">❄️ Snow</button>
+            <button onclick="changeWeather('t')" id="thunder-btn">⚡ Thunder</button>
+            <button onclick="changeWeather('c')" id="cloudy-btn">☁️ Cloudy</button>
+            <button onclick="toggleMute()" id="mute-btn">🔊 Sound</button>
+            <input type="range" id="volume-slider" min="0" max="100" value="30" onchange="setVolume(this.value)">
+        </div>
+
+        <canvas id="gameCanvas" width="640" height="480"></canvas>
+
+        <div class="loading-status" id="loading-status">🎵 Loading audio files...</div>
+
+        <div class="audio-info">
+            <p>🎵 Audio: High-quality weather sounds from Netlify hosting</p>
+            <p>🎮 Controls: Click weather buttons or use R/S/T/C/H keys • M key to mute</p>
+            <p style="font-size: 12px; color: #4CAF50;">✅ Now using CORS-enabled Netlify audio hosting!</p>
+        </div>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section class="contact-section" id="contact">
+        <div class="section-title">📬 Get In Cross</div>
+        <div class="section-subtitle">Let's connect and collaborate!</div>
+
+        <div class="form-container">
+            <iframe data-tally-src="https://tally.so/r/wL2Mgz" loading="lazy" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0" title="Contact Hritik Kushwaha"></iframe>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="creator-info">Created by Hritik Kushwaha</div>
+        <div class="credits">
+            Interactive Portfolio • Weather Simulation • Contact Form<br> Built with HTML5, CSS3, JavaScript & Canvas API
+        </div>
+    </footer>
+
+    <!-- Tally Form Script -->
+    <script>
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://tally.so/widgets/embed.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'tally-js'));
+    </script>
+
+    <!-- Weather Simulation Script -->
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Audio system with Netlify audio files
+        class AudioManager {
+            constructor() {
+                this.sounds = {};
+                this.currentSound = null;
+                this.currentFallbackSound = null;
+                this.volume = 0.3; // Default volume (30%)
+                this.initialized = false;
+                this.loadingCount = 0;
+                this.totalSounds = 5;
+                // Load Netlify audio files first
+                this.loadNetlifyAudio();
+            }
+
+            async loadNetlifyAudio() {
+                const soundFiles = {
+                    sunny: 'https://tikaudio.netlify.app/sunny.wav',
+                    rain: 'https://tikaudio.netlify.app/rain.wav',
+                    snow: 'https://tikaudio.netlify.app/snow.wav',
+                    thunder: 'https://tikaudio.netlify.app/thunder.wav',
+                    cloudy: 'https://tikaudio.netlify.app/cloudy.wav'
+                };
+
+                const loadingStatus = document.getElementById('loading-status');
+
+                for (const [key, url] of Object.entries(soundFiles)) {
+                    try {
+                        const audio = new Audio();
+
+                        // Set CORS and other properties for Netlify
+                        audio.crossOrigin = 'anonymous';
+                        audio.preload = 'auto';
+                        audio.loop = true;
+                        audio.volume = this.volume;
+
+                        // Promise-based loading with timeout
+                        const loadPromise = new Promise((resolve, reject) => {
+                            let resolved = false;
+
+                            const cleanup = () => {
+                                audio.removeEventListener('canplaythrough', onLoad);
+                                audio.removeEventListener('loadeddata', onLoad);
+                                audio.removeEventListener('error', onError);
+                            };
+
+                            const onLoad = () => {
+                                if (!resolved) {
+                                    resolved = true;
+                                    cleanup();
+                                    resolve();
+                                }
+                            };
+
+                            const onError = (e) => {
+                                if (!resolved) {
+                                    resolved = true;
+                                    cleanup();
+                                    reject(e);
+                                }
+                            };
+
+                            audio.addEventListener('canplaythrough', onLoad);
+                            audio.addEventListener('loadeddata', onLoad);
+                            audio.addEventListener('error', onError);
+
+                            // Timeout after 15 seconds
+                            setTimeout(() => {
+                                if (!resolved) {
+                                    resolved = true;
+                                    cleanup();
+                                    reject(new Error('Loading timeout'));
+                                }
+                            }, 15000);
+                        });
+
+                        audio.src = url;
+
+                        try {
+                            await loadPromise;
+                            this.sounds[key] = audio;
+                            this.loadingCount++;
+                            loadingStatus.textContent = `🎵 Loaded ${this.loadingCount}/${this.totalSounds} Netlify audio files...`;
+                            console.log(`✓ Successfully loaded ${key} audio from Netlify`);
+                        } catch (loadError) {
+                            console.warn(`⚠️ Could not load ${key} sound from ${url}:`, loadError.message);
+                            loadingStatus.textContent = `🎵 Loaded ${this.loadingCount}/${this.totalSounds} Netlify files... (${key} failed, using fallback)`;
+
+                            // Create a fallback synthetic sound
+                            this.createFallbackSound(key);
+                        }
+
+                    } catch (error) {
+                        console.warn(`Error creating audio for ${key}:`, error);
+                        this.createFallbackSound(key);
+                    }
+                }
+
+                // Update final status
+                if (this.loadingCount === this.totalSounds) {
+                    loadingStatus.textContent = '🎵 All Netlify audio files loaded successfully!';
+                    loadingStatus.style.color = '#4CAF50';
+                } else if (this.loadingCount > 0) {
+                    loadingStatus.textContent = `🎵 Loaded ${this.loadingCount}/${this.totalSounds} Netlify files. Using synthetic sounds for missing files.`;
+                } else {
+                    loadingStatus.textContent = '🎵 Using high-quality synthetic sounds (Netlify audio unavailable)';
+                    this.initSyntheticSounds();
+                }
+
+                setTimeout(() => {
+                    loadingStatus.style.display = 'none';
+                }, 3000);
+
+                this.initialized = true;
+            }
+
+            initSyntheticSounds() {
+                try {
+                    this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
+
+                    // Create all synthetic sounds if Netlify fails
+                    const syntheticSounds = {
+                        sunny: () => this.playFallbackSunny(),
+                        rain: () => this.playFallbackRain(),
+                        snow: () => this.playFallbackSnow(),
+                        thunder: () => this.playFallbackThunder(),
+                        cloudy: () => this.playFallbackCloudy()
+                    };
+
+                    // Only add synthetic sounds for missing ones
+                    Object.keys(syntheticSounds).forEach(key => {
+                        if (!this.sounds[key]) {
+                            this.sounds[key] = syntheticSounds[key];
+                        }
+                    });
+
+                } catch (error) {
+                    console.warn('Web Audio API not supported:', error);
+                }
+            }
+
+            createFallbackSound(soundType) {
+                // Create synthetic Web Audio API sounds as fallbacks
+                if (!this.audioContext) {
+                    try {
+                        this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
+                    } catch (e) {
+                        console.warn('Web Audio API not supported');
+                        return;
+                    }
+                }
+
+                // Store fallback sound generators
+                switch (soundType) {
+                    case 'rain':
+                        this.sounds[soundType] = () => this.playFallbackRain();
+                        break;
+                    case 'thunder':
+                        this.sounds[soundType] = () => this.playFallbackThunder();
+                        break;
+                    case 'snow':
+                        this.sounds[soundType] = () => this.playFallbackSnow();
+                        break;
+                    case 'sunny':
+                        this.sounds[soundType] = () => this.playFallbackSunny();
+                        break;
+                    case 'cloudy':
+                        this.sounds[soundType] = () => this.playFallbackCloudy();
+                        break;
+                }
+            }
+
+            playFallbackRain() {
+                const bufferSize = this.audioContext.sampleRate * 2;
+                const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.3;
+                }
+
+                const source = this.audioContext.createBufferSource();
+                const filter = this.audioContext.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(2000, this.audioContext.currentTime);
+
+                source.buffer = buffer;
+                source.loop = true;
+                source.connect(filter);
+                filter.connect(this.audioContext.destination);
+                source.start();
+
+                this.currentFallbackSound = source;
+            }
+
+            playFallbackThunder() {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(60, this.audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.1 * this.volume, this.audioContext.currentTime);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                oscillator.start();
+
+                this.currentFallbackSound = oscillator;
+            }
+
+            playFallbackSnow() {
+                const bufferSize = this.audioContext.sampleRate * 2;
+                const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.1;
+                }
+
+                const source = this.audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.loop = true;
+                source.connect(this.audioContext.destination);
+                source.start();
+
+                this.currentFallbackSound = source;
+            }
+
+            playFallbackSunny() {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.05 * this.volume, this.audioContext.currentTime);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                oscillator.start();
+
+                this.currentFallbackSound = oscillator;
+            }
+
+            playFallbackCloudy() {
+                const bufferSize = this.audioContext.sampleRate * 2;
+                const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.15;
+                }
+
+                const source = this.audioContext.createBufferSource();
+                const filter = this.audioContext.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(500, this.audioContext.currentTime);
+
+                source.buffer = buffer;
+                source.loop = true;
+                source.connect(filter);
+                filter.connect(this.audioContext.destination);
+                source.start();
+
+                this.currentFallbackSound = source;
+            }
+
+            stopCurrentSound() {
+                // Stop regular audio files
+                if (this.currentSound && !this.currentSound.paused) {
+                    this.currentSound.pause();
+                    this.currentSound.currentTime = 0;
+                }
+                this.currentSound = null;
+
+                // Stop fallback Web Audio API sounds
+                if (this.currentFallbackSound) {
+                    try {
+                        this.currentFallbackSound.stop();
+                    } catch (e) {
+                        // Sound might already be stopped
+                    }
+                    this.currentFallbackSound = null;
+                }
+            }
+
+            async playWeatherSound(weather) {
+                if (!this.initialized || !this.sounds[weather]) {
+                    console.warn(`Sound for ${weather} not available`);
+                    return;
+                }
+
+                // Stop current sound
+                this.stopCurrentSound();
+
+                try {
+                    const sound = this.sounds[weather];
+
+                    // Check if it's a regular audio file or fallback function
+                    if (typeof sound === 'function') {
+                        // It's a fallback synthetic sound
+                        sound();
+                    } else {
+                        // It's a regular audio file
+                        sound.currentTime = 0;
+                        sound.volume = this.volume;
+
+                        const playPromise = sound.play();
+                        if (playPromise !== undefined) {
+                            await playPromise;
+                            this.currentSound = sound;
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Could not play ${weather} sound:`, error);
+                    // Fallback to user interaction required message
+                    if (error.name === 'NotAllowedError') {
+                        document.getElementById('loading-status').textContent = '🎵 Click anywhere to enable audio';
+                        document.getElementById('loading-status').style.display = 'block';
+                    }
+                }
+            }
+
+            setVolume(volume) {
+                this.volume = Math.max(0, Math.min(1, volume));
+                Object.values(this.sounds).forEach(sound => {
+                    if (sound && typeof sound.volume !== 'undefined') {
+                        sound.volume = this.volume;
+                    }
+                });
+            }
+        }
+
+        // Initialize audio manager
+        const audioManager = new AudioManager();
+
+        // Constants
+        const WINDOW_WIDTH = 640;
+        const WINDOW_HEIGHT = 480;
+        const MAX_RAIN_DROPS = 100;
+        const MAX_SNOWFLAKES = 100;
+        const MAX_CLOUDS = 5;
+
+        // Weather state
+        let currentWeather = 'h';
+        let animationTime = 0;
+
+        // Initialize weather elements
+        const rainDrops = Array.from({
+            length: MAX_RAIN_DROPS
+        }, () => ({
+            x: Math.random() * WINDOW_WIDTH,
+            y: Math.random() * WINDOW_HEIGHT
+        }));
+
+        const snowflakes = Array.from({
+            length: MAX_SNOWFLAKES
+        }, () => ({
+            x: Math.random() * WINDOW_WIDTH,
+            y: Math.random() * WINDOW_HEIGHT
+        }));
+
+        const clouds = Array.from({
+            length: MAX_CLOUDS
+        }, () => ({
+            x: Math.random() * WINDOW_WIDTH,
+            y: Math.random() * 100 + 50
+        }));
+
+        // Airplane data
+        const airplanes = [{
+            x: -100,
+            y: 100,
+            speed: 2.0,
+            type: 0,
+            weatherType: 'h',
+            active: true
+        }, {
+            x: -60,
+            y: 60,
+            speed: 7.0,
+            type: 1,
+            weatherType: 'h',
+            active: true
+        }, {
+            x: -20,
+            y: 20,
+            speed: 11.0,
+            type: 2,
+            weatherType: 'h',
+            active: true
+        }, {
+            x: WINDOW_WIDTH / 2,
+            y: 5,
+            speed: 0,
+            type: 3,
+            weatherType: 'h',
+            active: true
+        }];
+
+        // Drawing functions
+        function drawFilledCircle(x, y, radius, color = null) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            if (color) ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawSunnyBackground() {
+            // Sky
+            ctx.fillStyle = '#6495ED';
+            ctx.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT - 100);
+
+            // Ground
+            ctx.fillStyle = '#228B22';
+            ctx.fillRect(0, WINDOW_HEIGHT - 100, WINDOW_WIDTH, 100);
+
+            // Sun
+            ctx.fillStyle = '#FFFF00';
+            drawFilledCircle(100, 100, 50);
+        }
+
+        function drawRain() {
+            ctx.strokeStyle = '#00FFFF';
+            ctx.lineWidth = 2;
+
+            rainDrops.forEach(drop => {
+                ctx.beginPath();
+                ctx.moveTo(drop.x, drop.y);
+                ctx.lineTo(drop.x, drop.y + 10);
+                ctx.stroke();
+
+                drop.y += 7;
+                if (drop.y >= WINDOW_HEIGHT) {
+                    drop.y = Math.random() * 100;
+                    drop.x = Math.random() * WINDOW_WIDTH;
+                }
+            });
+        }
+
+        function drawSnow() {
+            ctx.fillStyle = '#FFFFFF';
+
+            snowflakes.forEach(flake => {
+                drawFilledCircle(flake.x, flake.y, 3);
+
+                flake.y += 2;
+                flake.x += Math.sin(animationTime * 0.01 + flake.y * 0.01) * 0.5;
+
+                if (flake.y >= WINDOW_HEIGHT) {
+                    flake.y = Math.random() * 100;
+                    flake.x = Math.random() * WINDOW_WIDTH;
+                }
+            });
+        }
+
+        function drawThunderstorm() {
+            drawRain();
+
+            // Lightning effect
+            if (Math.random() < 0.05) {
+                ctx.strokeStyle = '#FFFF00';
+                ctx.lineWidth = 3;
+                const x = Math.random() * WINDOW_WIDTH;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x + Math.random() * 50 - 25, WINDOW_HEIGHT / 3);
+                ctx.lineTo(x + Math.random() * 100 - 50, WINDOW_HEIGHT / 2);
+                ctx.lineTo(x + Math.random() * 50 - 25, WINDOW_HEIGHT);
+                ctx.stroke();
+            }
+        }
+
+        function drawCloudy() {
+            clouds.forEach(cloud => {
+                // Main cloud body
+                ctx.fillStyle = '#A9A9A9';
+                drawFilledCircle(cloud.x, cloud.y, 22);
+
+                ctx.fillStyle = '#C0C0C0';
+                drawFilledCircle(cloud.x + 20, cloud.y - 10, 22);
+                drawFilledCircle(cloud.x - 20, cloud.y - 10, 22);
+
+                ctx.fillStyle = '#D3D3D3';
+                drawFilledCircle(cloud.x + 10, cloud.y + 10, 18);
+
+                cloud.x += 1;
+                if (cloud.x > WINDOW_WIDTH + 60) cloud.x = -60;
+            });
+        }
+
+        function drawDancer(x, y, isGirl, shirtColor, pantsColor) {
+            const sway = Math.sin(animationTime * 0.005) * 10;
+            const armSwing = Math.sin(animationTime * 0.01) * 15;
+            const legMove = Math.sin(animationTime * 0.01) * 15;
+
+            // Head
+            ctx.fillStyle = '#FFE0BD';
+            drawFilledCircle(x, y - 50, 15);
+
+            // Body
+            ctx.fillStyle = shirtColor;
+            ctx.fillRect(x - 10 + sway, y - 40, 20, 40);
+
+            // Legs/Skirt
+            ctx.fillStyle = pantsColor;
+            if (isGirl) {
+                // Skirt shape
+                ctx.beginPath();
+                ctx.moveTo(x - 10 + sway, y);
+                ctx.lineTo(x + 10 + sway, y);
+                ctx.lineTo(x + 15 + sway, y + 20);
+                ctx.lineTo(x - 15 + sway, y + 20);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                ctx.fillRect(x - 10 + sway, y, 20, 40);
+            }
+
+            // Arms
+            ctx.strokeStyle = '#FFE0BD';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - 10 + sway, y - 30);
+            ctx.lineTo(x - 30 + armSwing, y - 10);
+            ctx.moveTo(x + 10 + sway, y - 30);
+            ctx.lineTo(x + 30 - armSwing, y - 10);
+            ctx.stroke();
+
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(x - 10 + sway, y + 40);
+            ctx.lineTo(x - 10 + legMove, y + 70);
+            ctx.moveTo(x + 10 + sway, y + 40);
+            ctx.lineTo(x + 10 - legMove, y + 70);
+            ctx.stroke();
+        }
+
+        function drawUmbrella(x, y) {
+            // Canopy
+            ctx.fillStyle = '#FF0000';
+            ctx.beginPath();
+            ctx.arc(x, y, 50, Math.PI, 0, false);
+            ctx.fill();
+
+            // Ribs
+            ctx.strokeStyle = '#800000';
+            ctx.lineWidth = 2;
+            for (let angle = -90; angle <= 90; angle += 15) {
+                const rad = angle * Math.PI / 180;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + 50 * Math.cos(rad), y + 50 * Math.sin(rad));
+                ctx.stroke();
+            }
+
+            // Handle
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y + 60);
+            ctx.lineTo(x - 5, y + 70);
+            ctx.stroke();
+        }
+
+        function drawAirplane(airplane) {
+            ctx.fillStyle = '#FF0000';
+
+            // Body
+            ctx.fillRect(airplane.x, airplane.y - 5, 40, 10);
+
+            // Wings
+            ctx.beginPath();
+            ctx.moveTo(airplane.x + 15, airplane.y - 10);
+            ctx.lineTo(airplane.x + 30, airplane.y);
+            ctx.lineTo(airplane.x + 15, airplane.y + 10);
+            ctx.closePath();
+            ctx.stroke();
+
+            // Tail
+            ctx.beginPath();
+            ctx.moveTo(airplane.x, airplane.y - 5);
+            ctx.lineTo(airplane.x - 10, airplane.y - 10);
+            ctx.lineTo(airplane.x - 10, airplane.y + 5);
+            ctx.closePath();
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#FFBF00';
+            ctx.font = '16px Arial';
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+
+            switch (airplane.type) {
+                case 1: // Weather display plane
+                    const weatherLabels = {
+                        's': 'SNOWING',
+                        'r': 'RAINING',
+                        't': 'THUNDERING',
+                        'c': 'CLOUDY',
+                        'h': 'SUNNY'
+                    };
+                    ctx.fillText(weatherLabels[airplane.weatherType], airplane.x - 50, airplane.y - 5);
+                    break;
+                case 2: // RAM plane
+                    ctx.fillText('MY_MATE', airplane.x - 40, airplane.y - 3);
+                    break;
+                case 3: // MY_MATE plane
+                    ctx.fillText('WEATHER_SIMULATION', airplane.x - 100, airplane.y - 5);
+                    break;
+            }
+            ctx.shadowColor = 'transparent';
+        }
+
+        function updateAirplanes() {
+            airplanes.forEach(airplane => {
+                if (airplane.active) {
+                    airplane.x += airplane.speed;
+                    if (airplane.x > WINDOW_WIDTH + 50) {
+                        airplane.x = -50;
+                        if (airplane.type === 1) {
+                            airplane.y = 20 + Math.random() * 100;
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderText(text, x, y, color = '#FFBF00') {
+            ctx.fillStyle = 'rgba(0,0,0,0.8)';
+            ctx.font = '24px Arial';
+            ctx.fillText(text, x + 2, y + 2);
+
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+        }
+
+        function drawWeatherInfo() {
+            const weatherNames = {
+                'h': 'Sunny',
+                'r': 'Raining',
+                's': 'Snowing',
+                't': 'Thundering',
+                'c': 'Cloudy'
+            };
+            renderText(weatherNames[currentWeather], 20, 50);
+        }
+
+        function animate() {
+            animationTime = Date.now();
+
+            // Clear canvas with weather-appropriate background
+            switch (currentWeather) {
+                case 's':
+                    ctx.fillStyle = '#87CEEB';
+                    ctx.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+                    drawSnow();
+                    break;
+                case 'r':
+                    ctx.fillStyle = '#4682B4';
+                    ctx.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+                    drawRain();
+                    break;
+                case 't':
+                    ctx.fillStyle = '#323232';
+                    ctx.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+                    drawThunderstorm();
+                    break;
+                case 'c':
+                    ctx.fillStyle = '#B0C4DE';
+                    ctx.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+                    drawCloudy();
+                    break;
+                default:
+                    drawSunnyBackground();
+                    break;
+            }
+
+            // Update and draw airplanes
+            updateAirplanes();
+            airplanes.forEach(airplane => {
+                if (airplane.active) {
+                    drawAirplane(airplane);
+                }
+            });
+
+            // Draw dancers
+            drawDancer(WINDOW_WIDTH / 3, WINDOW_HEIGHT - 80, false, '#0000FF', '#000080');
+            drawDancer(2 * WINDOW_WIDTH / 3, WINDOW_HEIGHT - 80, true, '#FF69B4', '#FF1493');
+
+            // Draw umbrella
+            drawUmbrella(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 120);
+
+            // Draw weather info
+            drawWeatherInfo();
+
+            // Draw creator name
+            renderText('Hritik Kushwaha', WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT - 20);
+
+            requestAnimationFrame(animate);
+        }
+
+        function changeWeather(weather) {
+            currentWeather = weather;
+
+            // Update weather display airplane
+            airplanes.forEach(airplane => {
+                if (airplane.type === 1) {
+                    airplane.weatherType = weather;
+                }
+            });
+
+            // Update button states
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            const buttonMap = {
+                'h': 'sunny-btn',
+                'r': 'rain-btn',
+                's': 'snow-btn',
+                't': 'thunder-btn',
+                'c': 'cloudy-btn'
+            };
+            document.getElementById(buttonMap[weather]).classList.add('active');
+
+            // Play weather sound if not muted
+            if (!isMuted) {
+                audioManager.playWeatherSound(weather);
+            }
+        }
+
+        // Audio control functions
+        let isMuted = false;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const muteBtn = document.getElementById('mute-btn');
+
+            if (isMuted) {
+                audioManager.stopCurrentSound();
+                muteBtn.textContent = '🔇 Muted';
+                muteBtn.style.background = 'linear-gradient(145deg, #666, #444)';
+            } else {
+                muteBtn.textContent = '🔊 Sound';
+                muteBtn.style.background = '';
+                audioManager.playWeatherSound(currentWeather);
+            }
+        }
+
+        function setVolume(value) {
+            const volume = value / 100;
+            audioManager.setVolume(volume);
+        }
+
+        // Enable audio on first user interaction (required by browsers)
+        document.addEventListener('click', async() => {
+            if (audioManager.initialized && !isMuted) {
+                await audioManager.playWeatherSound(currentWeather);
+            }
+            document.getElementById('loading-status').style.display = 'none';
+        }, {
+            once: true
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (event) => {
+            const key = event.key.toLowerCase();
+            if (['r', 's', 't', 'c', 'h'].includes(key)) {
+                changeWeather(key);
+            }
+            if (key === 'm') {
+                toggleMute();
+            }
+        });
+
+        // Start animation
+        animate();
+    </script>
+</body>
+
+</html>
