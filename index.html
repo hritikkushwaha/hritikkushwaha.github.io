@@ -3,10 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta http-equiv="Permissions-Policy" content="autoplay=(), camera=(), microphone=(), geolocation=()">
-    <meta http-equiv="Feature-Policy" content="autoplay 'self'">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hritik Kushwaha</title>
     <style>
@@ -357,7 +353,7 @@
             <button onclick="changeWeather('t')" id="thunder-btn">⚡ Thunder</button>
             <button onclick="changeWeather('c')" id="cloudy-btn">☁️ Cloudy</button>
             <button onclick="toggleMute()" id="mute-btn">🔊 Sound</button>
-            <input type="range" id="volume-slider" min="0" max="100" value="30" onchange="setVolume(this.value)">
+            <input type="range" id="volume-slider" min="0" max="100" value="30" oninput="setVolume(this.value)">
         </div>
 
         <canvas id="gameCanvas" width="640" height="480"></canvas>
@@ -373,7 +369,7 @@
 
     <!-- Contact Form Section -->
     <section class="contact-section" id="contact">
-        <div class="section-title">📬 Get In Cross...</div>
+        <div class="section-title">📬 Get In Cross</div>
 
 
         <div class="form-container">
@@ -384,8 +380,7 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="creator-info">Created by Hritik Kushwaha</div>
-        <div class="credits">
-            Built with HTML5, CSS3, JavaScript & Canvas API
+        <div class="credits"></div>HTML5, CSS3, JavaScript & Canvas API
         </div>
     </footer>
 
@@ -411,6 +406,7 @@
             constructor() {
                 this.sounds = {};
                 this.currentSound = null;
+                this.currentGainNode = null; // Track the current gain node for real-time volume control
                 this.volume = 0.3; // Default volume (30%)
                 this.initialized = false;
                 this.audioContext = null;
@@ -483,6 +479,7 @@
                 source.start();
 
                 this.currentSound = source;
+                this.currentGainNode = gainNode; // Store reference for real-time volume control
                 console.log('🌧️ Playing synthetic rain sound');
             }
 
@@ -516,6 +513,7 @@
                 }, 500);
 
                 this.currentSound = oscillator;
+                this.currentGainNode = gainNode; // Store reference for real-time volume control
                 console.log('⚡ Playing synthetic thunder sound');
             }
 
@@ -549,6 +547,7 @@
                 source.start();
 
                 this.currentSound = source;
+                this.currentGainNode = gainNode; // Store reference for real-time volume control
                 console.log('❄️ Playing synthetic snow sound');
             }
 
@@ -583,6 +582,7 @@
                     osc1: oscillator1,
                     osc2: oscillator2
                 };
+                this.currentGainNode = gainNode; // Store reference for real-time volume control
                 console.log('☀️ Playing synthetic sunny sound');
             }
 
@@ -617,6 +617,7 @@
                 source.start();
 
                 this.currentSound = source;
+                this.currentGainNode = gainNode; // Store reference for real-time volume control
                 console.log('☁️ Playing synthetic cloudy sound');
             }
 
@@ -635,6 +636,37 @@
                         // Sound might already be stopped
                     }
                     this.currentSound = null;
+                    this.currentGainNode = null; // Clear the gain node reference
+                }
+            }
+
+            setVolume(volume) {
+                this.volume = Math.max(0, Math.min(1, volume));
+
+                // Update currently playing sound volume in real-time
+                if (this.currentGainNode && this.audioContext) {
+                    try {
+                        // Calculate appropriate volume multiplier based on current weather
+                        let volumeMultiplier = 0.5; // default
+
+                        // Adjust multiplier based on sound type (match the original multipliers)
+                        if (currentWeather === 'r') volumeMultiplier = 0.8; // rain
+                        else if (currentWeather === 't') volumeMultiplier = 0.6; // thunder
+                        else if (currentWeather === 's') volumeMultiplier = 0.4; // snow
+                        else if (currentWeather === 'h') volumeMultiplier = 0.2; // sunny
+                        else if (currentWeather === 'c') volumeMultiplier = 0.3; // cloudy
+
+                        // Smoothly transition to new volume to avoid audio pops
+                        this.currentGainNode.gain.cancelScheduledValues(this.audioContext.currentTime);
+                        this.currentGainNode.gain.setValueAtTime(this.currentGainNode.gain.value, this.audioContext.currentTime);
+                        this.currentGainNode.gain.linearRampToValueAtTime(this.volume * volumeMultiplier, this.audioContext.currentTime + 0.1);
+
+                        console.log(`🔊 Real-time volume updated to ${Math.round(this.volume * 100)}%`);
+                    } catch (error) {
+                        console.log(`⚠️ Could not update real-time volume: ${error.message}`);
+                    }
+                } else {
+                    console.log(`🔊 Volume set to ${Math.round(this.volume * 100)}% (will apply to next sound)`);
                 }
             }
 
@@ -1102,6 +1134,14 @@
         function setVolume(value) {
             const volume = value / 100;
             audioManager.setVolume(volume);
+
+            // Update volume display
+            console.log(`🔊 Volume slider moved to: ${value}%`);
+
+            // If there's a currently playing sound and we're not muted, restart it with new volume
+            if (!isMuted && audioManager.initialized && currentWeather) {
+                audioManager.playWeatherSound(currentWeather);
+            }
         }
 
         // Enable audio on first user interaction (required by browsers)
