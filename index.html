@@ -3,8 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
+
+    <meta http-equiv="Permissions-Policy" content="autoplay=(), camera=(), microphone=(), geolocation=()">
+    <meta http-equiv="Feature-Policy" content="autoplay 'self'">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hritik Kushwaha - Interactive Portfolio</title>
+    <title>Hritik Kushwaha</title>
     <style>
         * {
             margin: 0;
@@ -334,7 +338,7 @@
 <body>
     <!-- Header Section -->
     <section class="header-section" id="home">
-        <div class="typing">Hello I am Hritik Kushwaha Typing alphabet...</div>
+        <div class="typing">I am Hritik Kushwaha Typing Alphabet...</div>
 
         <div class="scroll-indicator" onclick="document.getElementById('weather').scrollIntoView()">
             ↓ Explore My Projects ↓
@@ -358,19 +362,19 @@
 
         <canvas id="gameCanvas" width="640" height="480"></canvas>
 
-        <div class="loading-status" id="loading-status">🎵 Loading audio files...</div>
+        <div class="loading-status" id="loading-status">🎵 Loading audio system...</div>
 
         <div class="audio-info">
-            <p>🎵 Audio: High-quality weather sounds from Netlify hosting</p>
+            <p>🎵 Audio: High-quality synthetic weather sounds using Web Audio API</p>
             <p>🎮 Controls: Click weather buttons or use R/S/T/C/H keys • M key to mute</p>
-            <p style="font-size: 12px; color: #4CAF50;">✅ Now using CORS-enabled Netlify audio hosting!</p>
+            <p style="font-size: 12px; color: #00ff88;">✅ Using advanced Web Audio synthesis - no external dependencies!</p>
         </div>
     </section>
 
     <!-- Contact Form Section -->
     <section class="contact-section" id="contact">
-        <div class="section-title">📬 Get In Cross</div>
-        <div class="section-subtitle">Let's connect and collaborate!</div>
+        <div class="section-title">📬 Get In Cross...</div>
+
 
         <div class="form-container">
             <iframe data-tally-src="https://tally.so/r/wL2Mgz" loading="lazy" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0" title="Contact Hritik Kushwaha"></iframe>
@@ -381,7 +385,7 @@
     <footer class="footer">
         <div class="creator-info">Created by Hritik Kushwaha</div>
         <div class="credits">
-            Interactive Portfolio • Weather Simulation • Contact Form<br> Built with HTML5, CSS3, JavaScript & Canvas API
+            Built with HTML5, CSS3, JavaScript & Canvas API
         </div>
     </footer>
 
@@ -402,294 +406,252 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Audio system with Netlify audio files
+        // Audio system with enhanced synthetic sounds
         class AudioManager {
             constructor() {
                 this.sounds = {};
                 this.currentSound = null;
-                this.currentFallbackSound = null;
                 this.volume = 0.3; // Default volume (30%)
                 this.initialized = false;
-                this.loadingCount = 0;
-                this.totalSounds = 5;
-                // Load Netlify audio files first
-                this.loadNetlifyAudio();
-            }
-
-            async loadNetlifyAudio() {
-                const soundFiles = {
-                    sunny: 'https://tikaudio.netlify.app/sunny.wav',
-                    rain: 'https://tikaudio.netlify.app/rain.wav',
-                    snow: 'https://tikaudio.netlify.app/snow.wav',
-                    thunder: 'https://tikaudio.netlify.app/thunder.wav',
-                    cloudy: 'https://tikaudio.netlify.app/cloudy.wav'
-                };
-
-                const loadingStatus = document.getElementById('loading-status');
-
-                for (const [key, url] of Object.entries(soundFiles)) {
-                    try {
-                        const audio = new Audio();
-
-                        // Set CORS and other properties for Netlify
-                        audio.crossOrigin = 'anonymous';
-                        audio.preload = 'auto';
-                        audio.loop = true;
-                        audio.volume = this.volume;
-
-                        // Promise-based loading with timeout
-                        const loadPromise = new Promise((resolve, reject) => {
-                            let resolved = false;
-
-                            const cleanup = () => {
-                                audio.removeEventListener('canplaythrough', onLoad);
-                                audio.removeEventListener('loadeddata', onLoad);
-                                audio.removeEventListener('error', onError);
-                            };
-
-                            const onLoad = () => {
-                                if (!resolved) {
-                                    resolved = true;
-                                    cleanup();
-                                    resolve();
-                                }
-                            };
-
-                            const onError = (e) => {
-                                if (!resolved) {
-                                    resolved = true;
-                                    cleanup();
-                                    reject(e);
-                                }
-                            };
-
-                            audio.addEventListener('canplaythrough', onLoad);
-                            audio.addEventListener('loadeddata', onLoad);
-                            audio.addEventListener('error', onError);
-
-                            // Timeout after 15 seconds
-                            setTimeout(() => {
-                                if (!resolved) {
-                                    resolved = true;
-                                    cleanup();
-                                    reject(new Error('Loading timeout'));
-                                }
-                            }, 15000);
-                        });
-
-                        audio.src = url;
-
-                        try {
-                            await loadPromise;
-                            this.sounds[key] = audio;
-                            this.loadingCount++;
-                            loadingStatus.textContent = `🎵 Loaded ${this.loadingCount}/${this.totalSounds} Netlify audio files...`;
-                            console.log(`✓ Successfully loaded ${key} audio from Netlify`);
-                        } catch (loadError) {
-                            console.warn(`⚠️ Could not load ${key} sound from ${url}:`, loadError.message);
-                            loadingStatus.textContent = `🎵 Loaded ${this.loadingCount}/${this.totalSounds} Netlify files... (${key} failed, using fallback)`;
-
-                            // Create a fallback synthetic sound
-                            this.createFallbackSound(key);
-                        }
-
-                    } catch (error) {
-                        console.warn(`Error creating audio for ${key}:`, error);
-                        this.createFallbackSound(key);
-                    }
-                }
-
-                // Update final status
-                if (this.loadingCount === this.totalSounds) {
-                    loadingStatus.textContent = '🎵 All Netlify audio files loaded successfully!';
-                    loadingStatus.style.color = '#4CAF50';
-                } else if (this.loadingCount > 0) {
-                    loadingStatus.textContent = `🎵 Loaded ${this.loadingCount}/${this.totalSounds} Netlify files. Using synthetic sounds for missing files.`;
-                } else {
-                    loadingStatus.textContent = '🎵 Using high-quality synthetic sounds (Netlify audio unavailable)';
-                    this.initSyntheticSounds();
-                }
-
-                setTimeout(() => {
-                    loadingStatus.style.display = 'none';
-                }, 3000);
-
-                this.initialized = true;
+                this.audioContext = null;
+                // Initialize synthetic sounds immediately
+                this.initSyntheticSounds();
             }
 
             initSyntheticSounds() {
                 try {
                     this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
 
-                    // Create all synthetic sounds if Netlify fails
-                    const syntheticSounds = {
-                        sunny: () => this.playFallbackSunny(),
-                        rain: () => this.playFallbackRain(),
-                        snow: () => this.playFallbackSnow(),
-                        thunder: () => this.playFallbackThunder(),
-                        cloudy: () => this.playFallbackCloudy()
+                    // Create all synthetic sounds with correct mapping
+                    this.sounds = {
+                        h: () => this.playFallbackSunny(), // sunny
+                        r: () => this.playFallbackRain(), // rain
+                        s: () => this.playFallbackSnow(), // snow
+                        t: () => this.playFallbackThunder(), // thunder
+                        c: () => this.playFallbackCloudy() // cloudy
                     };
 
-                    // Only add synthetic sounds for missing ones
-                    Object.keys(syntheticSounds).forEach(key => {
-                        if (!this.sounds[key]) {
-                            this.sounds[key] = syntheticSounds[key];
-                        }
-                    });
+                    this.initialized = true;
+                    console.log('✓ Synthetic audio system initialized');
+
+                    // Update loading status
+                    const loadingStatus = document.getElementById('loading-status');
+                    if (loadingStatus) {
+                        loadingStatus.textContent = '🎵 Audio system ready! Click a weather button to test sound.';
+                        loadingStatus.style.color = '#00ff88';
+                    }
 
                 } catch (error) {
                     console.warn('Web Audio API not supported:', error);
-                }
-            }
-
-            createFallbackSound(soundType) {
-                // Create synthetic Web Audio API sounds as fallbacks
-                if (!this.audioContext) {
-                    try {
-                        this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
-                    } catch (e) {
-                        console.warn('Web Audio API not supported');
-                        return;
+                    this.initialized = false;
+                    const loadingStatus = document.getElementById('loading-status');
+                    if (loadingStatus) {
+                        loadingStatus.textContent = '⚠️ Audio not available in this browser';
+                        loadingStatus.style.color = '#ff6666';
                     }
-                }
-
-                // Store fallback sound generators
-                switch (soundType) {
-                    case 'rain':
-                        this.sounds[soundType] = () => this.playFallbackRain();
-                        break;
-                    case 'thunder':
-                        this.sounds[soundType] = () => this.playFallbackThunder();
-                        break;
-                    case 'snow':
-                        this.sounds[soundType] = () => this.playFallbackSnow();
-                        break;
-                    case 'sunny':
-                        this.sounds[soundType] = () => this.playFallbackSunny();
-                        break;
-                    case 'cloudy':
-                        this.sounds[soundType] = () => this.playFallbackCloudy();
-                        break;
                 }
             }
 
             playFallbackRain() {
+                if (!this.audioContext) return;
+
+                // Create rain sound using white noise with filtering
                 const bufferSize = this.audioContext.sampleRate * 2;
                 const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
                 const data = buffer.getChannelData(0);
 
+                // Generate brown noise for rain
                 for (let i = 0; i < bufferSize; i++) {
                     data[i] = (Math.random() * 2 - 1) * 0.3;
                 }
 
                 const source = this.audioContext.createBufferSource();
                 const filter = this.audioContext.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(2000, this.audioContext.currentTime);
+                const gainNode = this.audioContext.createGain();
+
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(1000, this.audioContext.currentTime);
+                filter.Q.setValueAtTime(0.5, this.audioContext.currentTime);
+
+                gainNode.gain.setValueAtTime(this.volume * 0.8, this.audioContext.currentTime);
 
                 source.buffer = buffer;
                 source.loop = true;
                 source.connect(filter);
-                filter.connect(this.audioContext.destination);
+                filter.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
                 source.start();
 
-                this.currentFallbackSound = source;
+                this.currentSound = source;
+                console.log('🌧️ Playing synthetic rain sound');
             }
 
             playFallbackThunder() {
+                if (!this.audioContext) return;
+
+                // Create thunder sound using low frequency oscillation with envelope
                 const oscillator = this.audioContext.createOscillator();
                 const gainNode = this.audioContext.createGain();
+                const filter = this.audioContext.createBiquadFilter();
 
                 oscillator.type = 'sawtooth';
-                oscillator.frequency.setValueAtTime(60, this.audioContext.currentTime);
-                gainNode.gain.setValueAtTime(0.1 * this.volume, this.audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(40, this.audioContext.currentTime);
 
-                oscillator.connect(gainNode);
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(200, this.audioContext.currentTime);
+
+                // Thunder envelope - starts loud, fades quickly
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(this.volume * 0.6, this.audioContext.currentTime + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(this.volume * 0.1, this.audioContext.currentTime + 2);
+
+                oscillator.connect(filter);
+                filter.connect(gainNode);
                 gainNode.connect(this.audioContext.destination);
                 oscillator.start();
 
-                this.currentFallbackSound = oscillator;
+                // Add rumbling effect
+                setTimeout(() => {
+                    oscillator.frequency.setValueAtTime(30, this.audioContext.currentTime);
+                }, 500);
+
+                this.currentSound = oscillator;
+                console.log('⚡ Playing synthetic thunder sound');
             }
 
             playFallbackSnow() {
-                const bufferSize = this.audioContext.sampleRate * 2;
+                if (!this.audioContext) return;
+
+                // Create gentle wind/snow sound using filtered white noise
+                const bufferSize = this.audioContext.sampleRate * 3;
                 const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
                 const data = buffer.getChannelData(0);
 
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = (Math.random() * 2 - 1) * 0.1;
-                }
-
-                const source = this.audioContext.createBufferSource();
-                source.buffer = buffer;
-                source.loop = true;
-                source.connect(this.audioContext.destination);
-                source.start();
-
-                this.currentFallbackSound = source;
-            }
-
-            playFallbackSunny() {
-                const oscillator = this.audioContext.createOscillator();
-                const gainNode = this.audioContext.createGain();
-
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
-                gainNode.gain.setValueAtTime(0.05 * this.volume, this.audioContext.currentTime);
-
-                oscillator.connect(gainNode);
-                gainNode.connect(this.audioContext.destination);
-                oscillator.start();
-
-                this.currentFallbackSound = oscillator;
-            }
-
-            playFallbackCloudy() {
-                const bufferSize = this.audioContext.sampleRate * 2;
-                const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
-                const data = buffer.getChannelData(0);
-
+                // Generate soft white noise
                 for (let i = 0; i < bufferSize; i++) {
                     data[i] = (Math.random() * 2 - 1) * 0.15;
                 }
 
                 const source = this.audioContext.createBufferSource();
                 const filter = this.audioContext.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.setValueAtTime(500, this.audioContext.currentTime);
+                const gainNode = this.audioContext.createGain();
+
+                filter.type = 'highpass';
+                filter.frequency.setValueAtTime(2000, this.audioContext.currentTime);
+
+                gainNode.gain.setValueAtTime(this.volume * 0.4, this.audioContext.currentTime);
 
                 source.buffer = buffer;
                 source.loop = true;
                 source.connect(filter);
-                filter.connect(this.audioContext.destination);
+                filter.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
                 source.start();
 
-                this.currentFallbackSound = source;
+                this.currentSound = source;
+                console.log('❄️ Playing synthetic snow sound');
+            }
+
+            playFallbackSunny() {
+                if (!this.audioContext) return;
+
+                // Create pleasant sunny day ambience using multiple sine waves
+                const oscillator1 = this.audioContext.createOscillator();
+                const oscillator2 = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator1.type = 'sine';
+                oscillator1.frequency.setValueAtTime(220, this.audioContext.currentTime);
+
+                oscillator2.type = 'sine';
+                oscillator2.frequency.setValueAtTime(330, this.audioContext.currentTime);
+
+                gainNode.gain.setValueAtTime(this.volume * 0.2, this.audioContext.currentTime);
+
+                // Create a merger to blend the oscillators
+                const merger = this.audioContext.createChannelMerger(2);
+
+                oscillator1.connect(merger, 0, 0);
+                oscillator2.connect(merger, 0, 1);
+                merger.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator1.start();
+                oscillator2.start();
+
+                this.currentSound = {
+                    osc1: oscillator1,
+                    osc2: oscillator2
+                };
+                console.log('☀️ Playing synthetic sunny sound');
+            }
+
+            playFallbackCloudy() {
+                if (!this.audioContext) return;
+
+                // Create subtle wind sound using filtered noise
+                const bufferSize = this.audioContext.sampleRate * 2;
+                const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+
+                // Generate pink noise for wind
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.2;
+                }
+
+                const source = this.audioContext.createBufferSource();
+                const filter = this.audioContext.createBiquadFilter();
+                const gainNode = this.audioContext.createGain();
+
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(500, this.audioContext.currentTime);
+                filter.Q.setValueAtTime(1, this.audioContext.currentTime);
+
+                gainNode.gain.setValueAtTime(this.volume * 0.3, this.audioContext.currentTime);
+
+                source.buffer = buffer;
+                source.loop = true;
+                source.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                source.start();
+
+                this.currentSound = source;
+                console.log('☁️ Playing synthetic cloudy sound');
             }
 
             stopCurrentSound() {
-                // Stop regular audio files
-                if (this.currentSound && !this.currentSound.paused) {
-                    this.currentSound.pause();
-                    this.currentSound.currentTime = 0;
-                }
-                this.currentSound = null;
-
-                // Stop fallback Web Audio API sounds
-                if (this.currentFallbackSound) {
+                if (this.currentSound) {
                     try {
-                        this.currentFallbackSound.stop();
+                        if (this.currentSound.stop) {
+                            // Single audio source
+                            this.currentSound.stop();
+                        } else if (this.currentSound.osc1 && this.currentSound.osc2) {
+                            // Multiple oscillators (sunny sound)
+                            this.currentSound.osc1.stop();
+                            this.currentSound.osc2.stop();
+                        }
                     } catch (e) {
                         // Sound might already be stopped
                     }
-                    this.currentFallbackSound = null;
+                    this.currentSound = null;
                 }
             }
 
             async playWeatherSound(weather) {
-                if (!this.initialized || !this.sounds[weather]) {
+                if (!this.initialized) {
+                    console.warn(`Audio system not initialized`);
+                    return;
+                }
+
+                if (!this.sounds[weather]) {
                     console.warn(`Sound for ${weather} not available`);
                     return;
+                }
+
+                // Resume audio context if suspended
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    await this.audioContext.resume();
                 }
 
                 // Stop current sound
@@ -698,38 +660,20 @@
                 try {
                     const sound = this.sounds[weather];
 
-                    // Check if it's a regular audio file or fallback function
                     if (typeof sound === 'function') {
-                        // It's a fallback synthetic sound
+                        // It's a synthetic sound function
                         sound();
-                    } else {
-                        // It's a regular audio file
-                        sound.currentTime = 0;
-                        sound.volume = this.volume;
-
-                        const playPromise = sound.play();
-                        if (playPromise !== undefined) {
-                            await playPromise;
-                            this.currentSound = sound;
-                        }
+                        console.log(`✓ Successfully playing synthetic ${weather} sound`);
                     }
                 } catch (error) {
                     console.warn(`Could not play ${weather} sound:`, error);
-                    // Fallback to user interaction required message
-                    if (error.name === 'NotAllowedError') {
-                        document.getElementById('loading-status').textContent = '🎵 Click anywhere to enable audio';
-                        document.getElementById('loading-status').style.display = 'block';
-                    }
                 }
             }
 
             setVolume(volume) {
                 this.volume = Math.max(0, Math.min(1, volume));
-                Object.values(this.sounds).forEach(sound => {
-                    if (sound && typeof sound.volume !== 'undefined') {
-                        sound.volume = this.volume;
-                    }
-                });
+                console.log(`🔊 Volume set to ${Math.round(this.volume * 100)}%`);
+                // Volume changes will apply to new sounds
             }
         }
 
@@ -1125,9 +1069,15 @@
             };
             document.getElementById(buttonMap[weather]).classList.add('active');
 
+            // Enable audio on button click and play weather sound
+            enableAudio();
+
             // Play weather sound if not muted
             if (!isMuted) {
+                console.log(`Changing weather to ${weather}, attempting to play sound`);
                 audioManager.playWeatherSound(weather);
+            } else {
+                console.log(`Weather changed to ${weather} but audio is muted`);
             }
         }
 
@@ -1155,14 +1105,39 @@
         }
 
         // Enable audio on first user interaction (required by browsers)
-        document.addEventListener('click', async() => {
-            if (audioManager.initialized && !isMuted) {
-                await audioManager.playWeatherSound(currentWeather);
+        let audioEnabled = false;
+
+        async function enableAudio() {
+            if (!audioEnabled) {
+                audioEnabled = true;
+                console.log('Audio enabled by user interaction');
+
+                // Try to resume audio context if it exists
+                if (audioManager.audioContext && audioManager.audioContext.state === 'suspended') {
+                    await audioManager.audioContext.resume();
+                }
+
+                // Update loading status to show audio is ready
+                const loadingStatus = document.getElementById('loading-status');
+                if (loadingStatus) {
+                    loadingStatus.textContent = '🎵 Audio ready! Try changing the weather to hear sounds.';
+                    loadingStatus.style.color = '#00ff88';
+                    setTimeout(() => {
+                        loadingStatus.style.opacity = '0.7';
+                        loadingStatus.style.fontSize = '10px';
+                    }, 3000);
+                }
+
+                if (audioManager.initialized && !isMuted) {
+                    await audioManager.playWeatherSound(currentWeather);
+                }
             }
-            document.getElementById('loading-status').style.display = 'none';
-        }, {
-            once: true
-        });
+        }
+
+        // Multiple event listeners to ensure audio activation
+        document.addEventListener('click', enableAudio);
+        document.addEventListener('touchstart', enableAudio);
+        document.addEventListener('keydown', enableAudio);
 
         // Keyboard controls
         document.addEventListener('keydown', (event) => {
